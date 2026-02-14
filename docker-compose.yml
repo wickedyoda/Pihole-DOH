@@ -1,0 +1,55 @@
+services:
+  dnscrypt-proxy:
+    container_name: dnscrypt-proxy
+    build:
+      context: ./dnscrypt-proxy
+    environment:
+      # Listener for Pi-hole upstream queries
+      DNSCRYPT_LISTEN_ADDRESS: "${DNSCRYPT_LISTEN_ADDRESS:-0.0.0.0:5053}"
+      # Logical name used inside dnscrypt-proxy config
+      DOH_SERVER_NAME: "${DOH_SERVER_NAME:-custom-doh}"
+      # Required: DNS stamp for your DoH server (sdns://...)
+      DOH_SERVER_STAMP: "${DOH_SERVER_STAMP:?Set DOH_SERVER_STAMP in your .env file}"
+      # Comma-separated bootstrap resolvers used to resolve the DoH endpoint
+      DNSCRYPT_BOOTSTRAP_RESOLVERS: "${DNSCRYPT_BOOTSTRAP_RESOLVERS:-9.9.9.9:53,1.1.1.1:53}"
+    restart: unless-stopped
+
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    depends_on:
+      - dnscrypt-proxy
+    ports:
+      # DNS Ports
+      - "53:53/tcp"
+      - "53:53/udp"
+      # Default HTTP Port
+      - "80:80/tcp"
+      # Default HTTPS Port. FTL will generate a self-signed certificate
+      - "443:443/tcp"
+      # Uncomment below if using Pi-hole as your DHCP Server
+      # - "67:67/udp"
+      # Uncomment below if using Pi-hole as your NTP server
+      # - "123:123/udp"
+    environment:
+      # Set your timezone (e.g. America/New_York)
+      TZ: "${TZ:-UTC}"
+      # Set web password in .env
+      FTLCONF_webserver_api_password: "${PIHOLE_WEBPASSWORD:-change-me}"
+      # On Docker bridge network this should generally be ALL
+      FTLCONF_dns_listeningMode: "${PIHOLE_LISTENING_MODE:-ALL}"
+      # Force Pi-hole to send upstream DNS to dnscrypt-proxy
+      FTLCONF_dns_upstreams: "dnscrypt-proxy#5053"
+    volumes:
+      # Persist Pi-hole data
+      - "./etc-pihole:/etc/pihole"
+      # Uncomment below only if needed for dnsmasq migration/custom files
+      # - "./etc-dnsmasq.d:/etc/dnsmasq.d"
+    cap_add:
+      # Required only for DHCP use
+      - NET_ADMIN
+      # Required only for Pi-hole NTP client support
+      - SYS_TIME
+      # Optional processing priority
+      - SYS_NICE
+    restart: unless-stopped
