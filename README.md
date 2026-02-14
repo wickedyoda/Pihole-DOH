@@ -40,3 +40,25 @@ docker compose exec pihole pihole -t
 ```
 
 Pi-hole should forward to `dnscrypt-proxy#5053` (configured via `FTLCONF_dns_upstreams`).
+
+## GitHub Packages auto-build
+
+This repo includes a workflow at:
+- `.github/workflows/publish-dnscrypt-proxy.yml`
+- `.github/workflows/publish-dnscrypt-proxy-beta.yml`
+
+On every push to `main`, GitHub Actions builds `dnscrypt-proxy/Dockerfile` and pushes to GHCR:
+- `ghcr.io/<your-org-or-user>/pihole-doh-dnscrypt-proxy:latest`
+- `ghcr.io/<your-org-or-user>/pihole-doh-dnscrypt-proxy:<YYYYMMDD-HHMMSS>-main`
+
+For manual beta builds from your current branch, run:
+- Workflow: `Publish dnscrypt-proxy beta image`
+- Branch: choose the branch you want to build
+
+Manual beta tags:
+- `ghcr.io/<your-org-or-user>/pihole-doh-dnscrypt-proxy:latest-<branch>` (or `latest` when run on `main`)
+- `ghcr.io/<your-org-or-user>/pihole-doh-dnscrypt-proxy:<YYYYMMDD-HHMMSS>-<branch>`
+
+Notes:
+- It uses `secrets.GITHUB_TOKEN` (no extra PAT required for publishing from the same repo).
+- Ensure GitHub Actions is enabled for the repository.
