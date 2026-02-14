@@ -50,6 +50,7 @@ This repo includes a workflow at:
 On every push to `main`, GitHub Actions builds `dnscrypt-proxy/Dockerfile` and pushes to GHCR:
 - `ghcr.io/<your-org-or-user>/pihole-doh-dnscrypt-proxy:latest`
 - `ghcr.io/<your-org-or-user>/pihole-doh-dnscrypt-proxy:<YYYYMMDD-HHMMSS>-main`
+- Each tag is published as a multi-arch image (`linux/amd64` and `linux/arm64`)
 
 For manual beta builds from your current branch, run:
 - Workflow: `Publish dnscrypt-proxy beta image`
@@ -58,6 +59,7 @@ For manual beta builds from your current branch, run:
 Manual beta tags:
 - `ghcr.io/<your-org-or-user>/pihole-doh-dnscrypt-proxy:latest-<branch>` (or `latest` when run on `main`)
 - `ghcr.io/<your-org-or-user>/pihole-doh-dnscrypt-proxy:<YYYYMMDD-HHMMSS>-<branch>`
+- Each tag is published as a multi-arch image (`linux/amd64` and `linux/arm64`)
 
 Notes:
 - It uses `secrets.GITHUB_TOKEN` (no extra PAT required for publishing from the same repo).
