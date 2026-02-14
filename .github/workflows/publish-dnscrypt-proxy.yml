@@ -33,7 +33,7 @@ jobs:
         id: vars
         shell: bash
         run: |
-          IMAGE="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/pihole-doh-dnscrypt-proxy"
+          IMAGE="ghcr.io/wickedyoda/pihole-doh-dnscrypt-proxy"
           DATE_TAG="$(date -u +'%Y%m%d-%H%M%S')"
 
           {
